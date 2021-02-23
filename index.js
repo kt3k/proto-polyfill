@@ -130,7 +130,7 @@
     };
     defineProperty(O, "create", {
       value: function oCreate(source, props) {
-        var C = create(source, props);
+        var C = create(source || null, props);
         defineProperty(C, O_PROTO, {
           get: function cGetProto() {
             if (this === C) {
