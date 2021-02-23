@@ -28,7 +28,7 @@
         return getFunction(source, name, what);
       },
       enumerable: false,
-      configurable: false
+      configurable: true
     });
     return newFunction;
   }
@@ -96,13 +96,13 @@
     defineProperty(dest, P_PROTO, {
       value: sourceProto || source,
       enumerable: false,
-      configurable: false,
+      configurable: true,
       writable: false
     });
     defineProperty(dest, P_VALUE, {
       value: {},
       enumerable: false,
-      configurable: false,
+      configurable: true,
       writable: false
     });
     if (!sourceConstructor) {
@@ -140,7 +140,7 @@
             }
           },
           enumerable: false,
-          configurable: false
+          configurable: true
         });
         return C;
       },
@@ -178,20 +178,20 @@
           defineProperty(this, P_PROTO, {
             value: proto,
             enumerable: false,
-            configurable: false,
+            configurable: true,
             writable: false
           });
           defineProperty(this, P_VALUE, {
             value: {},
             enumerable: false,
-            configurable: false,
+            configurable: true,
             writable: false
           });
           setProperties(this, proto);
         }
       },
       enumerable: false,
-      configurable: false
+      configurable: true
     });
     defineProperty(F.prototype, O_PROTO, {
       get: function fGetProto() {
@@ -215,7 +215,7 @@
         setProto(this, source);
       },
       enumerable: false,
-      configurable: false
+      configurable: true
     });
   }
 })(Object, Function);
