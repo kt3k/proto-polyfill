@@ -1,17 +1,14 @@
-const O = Object;
-const F = Function;
-
 const O_PROTO = "__proto__";
 const P_PROTO = "___proto_polyfill_proto___";
 const P_FUNCT = "___proto_polyfill_funct___";
 const P_VALUE = "___proto_polyfill_value___";
 const SYMBOL = "Symbol(";
 
-const getPrototypeOf = O["getPrototypeOf"];
-const getOwnPropertyNames = O["getOwnPropertyNames"];
-const defineProperty = O["defineProperty"];
-const getOwnPropertyDescriptor = O["getOwnPropertyDescriptor"];
-const create = O["create"];
+const getPrototypeOf = Object["getPrototypeOf"];
+const getOwnPropertyNames = Object["getOwnPropertyNames"];
+const defineProperty = Object["defineProperty"];
+const getOwnPropertyDescriptor = Object["getOwnPropertyDescriptor"];
+const create = Object["create"];
 
 function getFunction(source, name, what) {
   const info = getOwnPropertyDescriptor(source, name);
@@ -35,8 +32,8 @@ function prepareFunction(dest, source, name, what) {
 
 function setProperty(dest, source, name) {
   const info = getOwnPropertyDescriptor(source, name);
-  const hasSetter = info.set instanceof F;
-  const hasGetter = info.get instanceof F;
+  const hasSetter = info.set instanceof Function;
+  const hasGetter = info.get instanceof Function;
   if (hasSetter && hasGetter) {
     defineProperty(dest, name, {
       set: prepareFunction(dest, source, name, "set"),
@@ -118,25 +115,25 @@ function setProto(dest, source) {
 }
 
 if (
-  !(O_PROTO in O) &&
-  !(O_PROTO in F) &&
-  getPrototypeOf instanceof F &&
-  getOwnPropertyNames instanceof F &&
-  defineProperty instanceof F &&
-  getOwnPropertyDescriptor instanceof F
+  !(O_PROTO in Object) &&
+  !(O_PROTO in Function) &&
+  getPrototypeOf instanceof Function &&
+  getOwnPropertyNames instanceof Function &&
+  defineProperty instanceof Function &&
+  getOwnPropertyDescriptor instanceof Function
 ) {
-  O["setPrototypeOf"] = function oSetPrototypeOf(obj, proto) {
-    if (obj instanceof O && obj !== null) {
+  Object["setPrototypeOf"] = function oSetPrototypeOf(obj, proto) {
+    if (obj instanceof Object && obj !== null) {
       obj.__proto__ = proto;
     }
     return obj;
   };
-  O["getPrototypeOf"] = function oGetPrototypeOf(obj) {
-    return obj instanceof O && obj !== null
+  Object["getPrototypeOf"] = function oGetPrototypeOf(obj) {
+    return obj instanceof Object && obj !== null
       ? obj.__proto__
       : getPrototypeOf(obj);
   };
-  defineProperty(O, "create", {
+  defineProperty(Object, "create", {
     value: function oCreate(source, props) {
       const C = create(source || null, props);
       defineProperty(C, O_PROTO, {
@@ -156,7 +153,7 @@ if (
     configurable: true,
     writable: true,
   });
-  defineProperty(O.prototype, O_PROTO, {
+  defineProperty(Object.prototype, O_PROTO, {
     get: function oGetProto() {
       switch (typeof this) {
         case "string":
@@ -178,13 +175,13 @@ if (
         return constr.prototype || null;
       } else {
         const proto = constr.__proto__;
-        return this !== O.prototype && proto.prototype === undefined
-          ? O.prototype
+        return this !== Object.prototype && proto.prototype === undefined
+          ? Object.prototype
           : proto.prototype || null;
       }
     },
     set: function oSetProto(proto) {
-      if (proto && this instanceof O) {
+      if (proto && this instanceof Object) {
         defineProperty(this, P_PROTO, {
           value: proto,
           enumerable: false,
@@ -203,7 +200,7 @@ if (
     enumerable: false,
     configurable: true,
   });
-  defineProperty(F.prototype, O_PROTO, {
+  defineProperty(Function.prototype, O_PROTO, {
     get: function fGetProto() {
       if (typeof this.prototype === "function") {
         return getPrototypeOf(this.constructor);
@@ -212,7 +209,7 @@ if (
         if (this.prototype) {
           setProto(this, getPrototypeOf(this));
         } else {
-          return O.prototype;
+          return Object.prototype;
         }
       }
       if (this[P_PROTO]) {
