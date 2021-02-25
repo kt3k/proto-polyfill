@@ -11,15 +11,19 @@
   <script src="https://cdn.rawgit.com/mochajs/mocha/2.2.5/mocha.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/4.1.0/chai.min.js"></script>
   <script>mocha.setup('bdd')</script>
-  <script src="../index.js"></script>
   <script src="./limitations.js"></script>
   <script src="./core.js"></script>
   <script src="./core-plus.js"></script>
   <script src="./class-like.js"></script>
-  <script>
-    mocha.checkLeaks();
-    mocha.setup({ignoreLeaks: true});
-    mocha.run();
+  <script type="module">
+    delete Object.prototype.__proto__;
+    async function main() {
+      await import("../index.js");
+      mocha.checkLeaks();
+      mocha.setup({ignoreLeaks: true});
+      mocha.run();
+    }
+    main();
   </script>
 </body>
 </html>
