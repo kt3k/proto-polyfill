@@ -1,21 +1,21 @@
 const O = Object;
 const F = Function;
 
-var O_PROTO = "__proto__";
-var P_PROTO = "___proto_polyfill_proto___";
-var P_FUNCT = "___proto_polyfill_funct___";
-var P_VALUE = "___proto_polyfill_value___";
-var SYMBOL = "Symbol(";
+const O_PROTO = "__proto__";
+const P_PROTO = "___proto_polyfill_proto___";
+const P_FUNCT = "___proto_polyfill_funct___";
+const P_VALUE = "___proto_polyfill_value___";
+const SYMBOL = "Symbol(";
 
-var getPrototypeOf = O["getPrototypeOf"];
-var getOwnPropertyNames = O["getOwnPropertyNames"];
-var defineProperty = O["defineProperty"];
-var getOwnPropertyDescriptor = O["getOwnPropertyDescriptor"];
-var create = O["create"];
+const getPrototypeOf = O["getPrototypeOf"];
+const getOwnPropertyNames = O["getOwnPropertyNames"];
+const defineProperty = O["defineProperty"];
+const getOwnPropertyDescriptor = O["getOwnPropertyDescriptor"];
+const create = O["create"];
 
 function getFunction(source, name, what) {
-  var info = getOwnPropertyDescriptor(source, name);
-  var func = info[what];
+  const info = getOwnPropertyDescriptor(source, name);
+  const func = info[what];
   return func[P_FUNCT] || func;
 }
 
@@ -28,52 +28,56 @@ function prepareFunction(dest, source, name, what) {
       return getFunction(source, name, what);
     },
     enumerable: false,
-    configurable: true
+    configurable: true,
   });
   return newFunction;
 }
 
 function setProperty(dest, source, name) {
-  var info = getOwnPropertyDescriptor(source, name);
-  var hasSetter = info.set instanceof F;
-  var hasGetter = info.get instanceof F;
+  const info = getOwnPropertyDescriptor(source, name);
+  const hasSetter = info.set instanceof F;
+  const hasGetter = info.get instanceof F;
   if (hasSetter && hasGetter) {
     defineProperty(dest, name, {
       set: prepareFunction(dest, source, name, "set"),
       get: prepareFunction(dest, source, name, "get"),
       enumerable: info.enumerable || false,
-      configurable: true
+      configurable: true,
     });
   } else if (hasSetter) {
     defineProperty(dest, name, {
       set: prepareFunction(dest, source, name, "set"),
       enumerable: info.enumerable || false,
-      configurable: true
+      configurable: true,
     });
   } else if (hasGetter) {
     defineProperty(dest, name, {
       get: prepareFunction(dest, source, name, "get"),
       enumerable: info.enumerable || false,
-      configurable: true
+      configurable: true,
     });
   } else {
     defineProperty(dest, name, {
-      set: function(v) {
+      set: function (v) {
         this[P_VALUE][name] = v;
       },
-      get: function() {
-        return name in this[P_VALUE] ? this[P_VALUE][name] : this === dest ? source[name] : dest[name];
+      get: function () {
+        return name in this[P_VALUE]
+          ? this[P_VALUE][name]
+          : this === dest
+          ? source[name]
+          : dest[name];
       },
       enumerable: info.enumerable || false,
-      configurable: true
+      configurable: true,
     });
   }
 }
 
 function setProperties(dest, source) {
-  var names = getOwnPropertyNames(source),
-    name,
-    n = 0;
+  const names = getOwnPropertyNames(source);
+  let name;
+  let n = 0;
   for (; n < names.length; n++) {
     name = names[n];
     if (
@@ -91,19 +95,21 @@ function setProperties(dest, source) {
 }
 
 function setProto(dest, source) {
-  var sourceProto = typeof source === "function" ? source.prototype : source;
-  var sourceConstructor = typeof source === "function" ? source : sourceProto && sourceProto.constructor;
+  const sourceProto = typeof source === "function" ? source.prototype : source;
+  const sourceConstructor = typeof source === "function"
+    ? source
+    : sourceProto && sourceProto.constructor;
   defineProperty(dest, P_PROTO, {
     value: sourceProto || source,
     enumerable: false,
     configurable: true,
-    writable: false
+    writable: false,
   });
   defineProperty(dest, P_VALUE, {
     value: {},
     enumerable: false,
     configurable: true,
-    writable: false
+    writable: false,
   });
   if (!sourceConstructor) {
     return;
@@ -126,11 +132,13 @@ if (
     return obj;
   };
   O["getPrototypeOf"] = function oGetPrototypeOf(obj) {
-    return obj instanceof O && obj !== null ? obj.__proto__ : getPrototypeOf(obj);
+    return obj instanceof O && obj !== null
+      ? obj.__proto__
+      : getPrototypeOf(obj);
   };
   defineProperty(O, "create", {
     value: function oCreate(source, props) {
-      var C = create(source || null, props);
+      const C = create(source || null, props);
       defineProperty(C, O_PROTO, {
         get: function cGetProto() {
           if (this === C) {
@@ -140,13 +148,13 @@ if (
           }
         },
         enumerable: false,
-        configurable: true
+        configurable: true,
       });
       return C;
     },
     enumerable: false,
     configurable: true,
-    writable: true
+    writable: true,
   });
   defineProperty(O.prototype, O_PROTO, {
     get: function oGetProto() {
@@ -161,7 +169,7 @@ if (
       if (P_PROTO in this) {
         return this[P_PROTO];
       }
-      var constr = this.constructor;
+      const constr = this.constructor;
       if (!constr) {
         return null;
       } else if (typeof constr.prototype === "function") {
@@ -169,8 +177,10 @@ if (
       } else if (this instanceof constr) {
         return constr.prototype || null;
       } else {
-        var proto = constr.__proto__;
-        return this !== O.prototype && proto.prototype === undefined ? O.prototype : proto.prototype || null;
+        const proto = constr.__proto__;
+        return this !== O.prototype && proto.prototype === undefined
+          ? O.prototype
+          : proto.prototype || null;
       }
     },
     set: function oSetProto(proto) {
@@ -179,19 +189,19 @@ if (
           value: proto,
           enumerable: false,
           configurable: true,
-          writable: false
+          writable: false,
         });
         defineProperty(this, P_VALUE, {
           value: {},
           enumerable: false,
           configurable: true,
-          writable: false
+          writable: false,
         });
         setProperties(this, proto);
       }
     },
     enumerable: false,
-    configurable: true
+    configurable: true,
   });
   defineProperty(F.prototype, O_PROTO, {
     get: function fGetProto() {
@@ -206,7 +216,9 @@ if (
         }
       }
       if (this[P_PROTO]) {
-        return typeof this[P_PROTO] === "function" ? this[P_PROTO] : this[P_PROTO].constructor;
+        return typeof this[P_PROTO] === "function"
+          ? this[P_PROTO]
+          : this[P_PROTO].constructor;
       } else {
         return null;
       }
@@ -215,7 +227,7 @@ if (
       setProto(this, source);
     },
     enumerable: false,
-    configurable: true
+    configurable: true,
   });
 }
 
