@@ -1,3 +1,4 @@
+// Copyright 2017 webcarrot. All rights reserved. MIT license.
 const O_PROTO = "__proto__";
 const P_PROTO = "___proto_polyfill_proto___";
 const P_FUNCT = "___proto_polyfill_funct___";
