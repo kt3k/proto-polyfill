@@ -1,5 +1,5 @@
-// Copyright 2021 Yoshiya Hinosawa. All rights reserved. MIT license.
 // Copyright 2017 webcarrot. All rights reserved. MIT license.
+// https://github.com/webcarrot/proto-polyfill
 const O_PROTO = "__proto__";
 const P_PROTO = "___proto_polyfill_proto___";
 const P_FUNCT = "___proto_polyfill_funct___";
@@ -229,3 +229,5 @@ if (
     configurable: true,
   });
 }
+
+export {};
